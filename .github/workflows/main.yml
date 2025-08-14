@@ -42,3 +42,14 @@ jobs:
         file: ./backend/Dockerfile
         push: true
         tags: ghcr.io/${{ github.repository }}/backend:latest
+
+    # Pull latest images
+    - name: Deploy frontend
+      run: |
+        docker pull ghcr.io/${{ github.repository }}/frontend:latest
+        docker run -d -p 8080:8080 ghcr.io/${{ github.repository }}/frontend:latest
+
+    - name: Deploy backend
+      run: |
+        docker pull ghcr.io/${{ github.repository }}/backend:latest
+        docker run -d -p 9000:9000 ghcr.io/${{ github.repository }}/backend:latest
