@@ -17,5 +17,4 @@ jobs:
           trivy-version: v0.53.0
 
       - name: Trivy filesystem scan
-        run: trivy fs --severity HIGH,CRITICAL --ignore-unfixed --no-progress .
-        continue-on-error: true
+        run: trivy fs --severity HIGH,CRITICAL
