@@ -64,3 +64,8 @@ jobs:
         docker rm -f test-backend || true
         docker rm -f test-redis || true
         docker network rm test-net || true
+
+    - name: Continuous Deployment
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+        kubectl --kubeconfig kubeconfig apply -f k8s/
