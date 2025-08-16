@@ -1,0 +1,22 @@
+name: Security Scan
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Trivy
+        uses: aquasecurity/setup-trivy@v0.2.3
+        with:
+          version: v0.65.0 
+
+      - name: Trivy filesystem scan (non-blocking)
+        run: trivy fs --severity HIGH,CRITICAL --ignore-unfixed --no-progress .
+        continue-on-error: true
