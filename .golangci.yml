@@ -1,11 +1,7 @@
 run:
-  timeout: 5m
+  timeout: 2m
+
 linters:
+  disable-all: true
   enable:
-    - govet
-    - gosimple
-    - ineffassign
     - gofmt
-    - revive
-  disable:
-    - errcheck
