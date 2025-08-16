@@ -4,6 +4,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
   trivy:
@@ -12,9 +13,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Trivy
-        uses: aquasecurity/setup-trivy@v1
+        uses: aquasecurity/setup-trivy@v0.2.3
         with:
-          trivy-version: v0.65.0
+          version: v0.65.0  # Trivy CLI version (latest as of now)
 
       - name: Trivy filesystem scan (non-blocking)
         run: trivy fs --severity HIGH,CRITICAL --ignore-unfixed --no-progress .
