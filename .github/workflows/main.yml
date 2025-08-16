@@ -64,6 +64,9 @@ jobs:
         docker rm -f test-backend || true
         docker rm -f test-redis || true
         docker network rm test-net || true
+        
+    - name: Set repository name lowercase
+      run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
     - name: Continuous Deployment
       run: |
