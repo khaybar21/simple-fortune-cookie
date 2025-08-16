@@ -1,5 +1,6 @@
 run:
   timeout: 5m
+
 linters:
   enable:
     - govet
@@ -7,7 +8,8 @@ linters:
     - ineffassign
     - gofmt
     - revive
-    disable:
-    - errcheck
-issues:
-  exclude-use-default: false
+
+linters-settings:
+  errcheck:
+    exclude-functions:
+      - (net/http.ResponseWriter).Write
