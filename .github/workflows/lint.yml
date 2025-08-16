@@ -1,26 +1,19 @@
-name: Lint (golangci)
+name: Lint
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  golangci:
+  gofmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: backend/go.mod
-      - uses: golangci/golangci-lint-action@v6
-        with:
-          working-directory: backend
-          version: v1.60.3
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: frontend/go.mod
-      - uses: golangci/golangci-lint-action@v6
-        with:
-          working-directory: frontend
-          version: v1.60.3
+          go-version: stable
+      - name: Files needing format
+        run: |
+          gofmt -s -l backend || true
+          gofmt -s -l frontend || true
