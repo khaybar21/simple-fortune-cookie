@@ -15,7 +15,7 @@ jobs:
       - name: Setup Trivy
         uses: aquasecurity/setup-trivy@v0.2.3
         with:
-          version: v0.65.0  # Trivy CLI version (latest as of now)
+          version: v0.65.0 
 
       - name: Trivy filesystem scan (non-blocking)
         run: trivy fs --severity HIGH,CRITICAL --ignore-unfixed --no-progress .
