@@ -27,13 +27,16 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Set repository name lowercase
+      run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
     - name: Build and push frontend image
       uses: docker/build-push-action@v5
       with:
         context: ./frontend
         file: ./frontend/Dockerfile
         push: true
-        tags: ghcr.io/${{ github.repository }}/frontend:latest
+        tags: ghcr.io/${{ env.REPO_LC }}/frontend:latest
 
     - name: Build and push backend image
       uses: docker/build-push-action@v5
@@ -41,21 +44,19 @@ jobs:
         context: ./backend
         file: ./backend/Dockerfile
         push: true
-        tags: ghcr.io/${{ github.repository }}/backend:latest
+        tags: ghcr.io/${{ env.REPO_LC }}/backend:latest
 
-    - name: start test 
+    - name: Start test containers
       run: |
         set -e
         docker network create test-net
         docker run -d --rm --name test-redis --network test-net redis:alpine
-        docker run -d --rm --name test-backend --network test-net -p 9000:9000 -e REDIS_DNS=test-redis ghcr.io/${{ github.repository }}/backend:latest
-        docker run -d --rm --name test-frontend --network test-net -p 8080:8080 -e BACKEND_DNS=test-backend -e BACKEND_PORT=9000 ghcr.io/${{ github.repository }}/frontend:latest
-        # give containers a moment to boot
+        docker run -d --rm --name test-backend --network test-net -p 9000:9000 -e REDIS_DNS=test-redis ghcr.io/${{ env.REPO_LC }}/backend:latest
+        docker run -d --rm --name test-frontend --network test-net -p 8080:8080 -e BACKEND_DNS=test-backend -e BACKEND_PORT=9000 ghcr.io/${{ env.REPO_LC }}/frontend:latest
         sleep 5
 
-    - name: run test.sh
-      run: |
-        bash ./test.sh
+    - name: Run test.sh
+      run: bash ./test.sh
 
     - name: Cleanup
       if: always()
@@ -64,11 +65,15 @@ jobs:
         docker rm -f test-backend || true
         docker rm -f test-redis || true
         docker network rm test-net || true
-        
-    - name: Set repository name lowercase
-      run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: v1.29.0
 
     - name: Continuous Deployment
+      if: github.event_name == 'push'
       run: |
         echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
         kubectl --kubeconfig kubeconfig apply -f k8s/
+
